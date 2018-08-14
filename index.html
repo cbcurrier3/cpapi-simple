@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html class="  ext-strict">
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9,IE=EmulateIE8">
+<link rel="stylesheet" type="text/css" href="css/extra.css">
+<link rel="stylesheet" type="text/css" href="web/extjs4/resources/css/ext-all.css">
+<link rel="stylesheet" type="text/css" href="css/ext-all-gaia.css">
+<link rel="stylesheet" type="text/css" href="css/xtheme-webui.css">
+<link rel="stylesheet" href="web/vendor/jquery-ui-1.12.1/jquery-ui.theme.css">
+  <style>
+    label, input { display:block; }
+    .ui-dialog .ui-state-error { padding: .3em; }
+    .validateTips { border: 1px solid transparent; padding: 0.3em; }
+ </style>
+<script src="web/extjs4/ext-all.js"></script>
+<script src="web/js/util.js"></script>
+<script src="web/vendor/jquery-3.0.0.js"></script>
+<script src="web/vendor/jquery-ui-1.12.1/jquery-ui.js"></script>
+<script>
+$(document).ready(function() {
+   var myMask = new Ext.LoadMask(Ext.getBody(), {msg:"Please wait..."});
+   $.ajax({
+        url: 'bin/add-rule-helper.py?what=hosts',
+        type: 'post',
+        datatype: 'json',
+        success: function(data){
+            var toAppend = '';
+                for(var i=0;i<data.length;i++){
+                    toAppend += '<option value='+data[i]['name']+'>'+data[i]['name']+' ('+data[i]['ipv4-address']+')</option>';
+                }
+            $('#listHosts').append(toAppend);
+	    $('#destHosts').append(toAppend);
+
+        }
+   });
+   $.ajax({
+        url: 'bin/add-rule-helper.py?what=services',
+        type: 'post',
+        datatype: 'json',
+        success: function(data){
+            var appendPorts = '';
+                for(var p=0;p<data.length;p++){
+                    appendPorts += '<option value='+data[p]['sname']+'>'+data[p]['sname']+' ('+data[p]['sport']+')</option>';
+                }
+            $('#TCPports').append(appendPorts);
+
+        }
+    })
+
+    $( "#sendrule" ).button().on( "click", function() {
+      myMask.show();
+
+      var sent = sendRule().delay(10);
+ 
+      myMask.hide();
+     });
+    function sendRule() {
+      var valid = true;
+      //allFields.removeClass( "ui-state-error" );
+      var sipadd = $("#sourceip").val();
+      var sipdest = $("#destip").val();
+      var sport = $("#service").val();
+      if ($("#raction").prop("checked")){
+        var saction = "Accept";
+      }else{
+        var saction = "Drop";
+      }
+      var sendhost = $.post('bin/add-rule-helper.py',
+	{
+	what : 'simplerule',
+	source : sipadd,
+	dest : sipdest,
+	port : sport,
+	 act : saction
+	})
+      .always(function( data ) {
+	 if( data.hasOwnProperty("responseText") ){
+           myMask.hide();
+           window.alert(data.responseText);
+	 } else {
+	   myMask.hide();
+	   window.alert('Rule ' + data.name + ' Created');
+	   document.forms["addRuleForm"].reset();
+	 }
+      })
+    };
+  } );
+</script> 
+  <title>Add Access Rule</title>
+</head>
+<body class="webui-onload x-body x-gecko x-linux x-reset x-container x-container-default x-border-layout-ct" role="application">
+<!-- <script type="text/javascript" src="web/vendor/jquery.1.12.1.min.js"></script> -->
+<div class="x-box-inner" role="presentation" id="ext-gen1048" style="width: 1366px; height: 500px;">
+<div id="toppanel_main_container" class="x-container toppanel-main-container x-box-item x-container-default x-box-layout-ct" style="margin: 0px; height: 45px; width: 1366px; left: 0px; top: 0px;" role="presentation">
+<div class="x-box-inner" role="presentation" id="ext-gen1050" style="height: 44px; width: 1366px;">
+<div id="cp4_container-1033" class="x-container top_center x-box-item x-container-default" style="width: 165px; height: 44px; margin: 0px; left: 0px; top: 0px;" role="presentation">
+<div id="top_west_header" class="x-container top-west-header x-container-default" style="padding: 2px 0px 0px 10px; width: 100%;" role="presentation">Check Point API</div>
+<div id="top_west_hostname" class="x-container top-west-hostname x-container-default" style="padding: 2px 0px 0px 10px; width: 100%;" role="presentation" title="DEMO">Demo</div>
+<div class="x-clear" role="presentation" id="ext-gen1056"></div></div>
+
+<div id="cp4_container-1034" class="x-container top_center x-box-item x-container-default" style="height: 44px; margin: 0px; left: 165px; top: 0px; width: 801px;" role="presentation">
+<div id="top_center_page" class="x-container h1" style="padding: 2px 0px 0px 10px; width: 100%;font-size:18px;font-weight:bold;text-align:center;color:#BCD6FD;" role="presentation" title="This Page">Add Access Rule to Policy </div>
+<div class="x-clear" role="presentation"></div></div>
+<div id="tbfill-1039" class="x-component x-box-item x-toolbar-item x-component-default" role="presentation" style="margin: 0px; left: 688px; top: 0px; width: 96px;" tabindex="-1"></div></div></div>
+<div class="x-clear" role="presentation" id="ext-gen1072"></div></div>
+<div id="top_east_header" class="x-container top_center x-box-item x-container-default" style="width: 400px; height: 44px; margin: 0px; left: 966px; top: 0px;" role="presentation">
+<div id="top_panel_east" class="x-container top_right_picture x-box-item x-toolbar-item x-container-default" style="width: 120px; height: 44px; margin: 0px; left: 276px; top: 0px;" role="presentation" tabindex="-1"></div></div></div>
+<div class="x-clear" role="presentation" id="ext-gen1082"></div></div></div></div>
+
+<div id="viewport-1047-embedded-center" class="x-container x-border-item x-box-item x-container-default x-box-layout-ct" role="presentation" style="margin: 0px; width: 1366px; height: 400px; left: 0px; top: 47px;">
+<div class="x-box-inner" role="presentation" id="ext-gen1094" style="width: 1366px; height: 400px;">
+<div id="cptree" class="x-panel x-tree-panel x-tree-no-lines main-navtree x-grid x-grid-header-hidden x-box-item x-panel-default x-vertical-scroller-present" style="width: 260px; height: 400px; margin: 0px; left: 0px; top: 0px;" role="presentation" aria-labelledby="component-1066">
+
+<div id="header-1065" class="x-panel-header x-panel-header-default x-horizontal x-panel-header-horizontal x-panel-header-default-horizontal x-top x-panel-header-top x-panel-header-default-top x-unselectable x-docked x-docked-top x-panel-header-docked-top x-panel-header-default-docked-top" style="-moz-user-select: none; width: 260px; left: 0px; top: 0px;" role="presentation">
+<div id="header-1065-body" class="x-panel-header-body x-panel-header-body-default-horizontal x-panel-header-body-default-top x-panel-header-body-default x-panel-header-body-horizontal x-panel-header-body-top x-box-layout-ct">
+<div class="x-box-inner" role="presentation" id="ext-gen1099" style="width: 249px; height: 16px;">
+<div id="component-1066" class="x-component x-panel-header-text-container x-box-item x-component-default" role="heading" style="margin: 0px; width: 233px; height: 15px; left: 0px; top: 1px;"><span id="component-1066-textEl" class="x-panel-header-text x-panel-header-text-default">&nbsp;</span></div>
+</div></div></div>
+<div id="cptree-body" class="x-panel-body   x-grid-body x-panel-body-default x-panel-body-default x-layout-fit" style="width: 244px; left: 0px; top: 54px; height: 400px;">
+<div id="treeview-1052" class="x-grid-view x-fit-item x-grid-view-default x-unselectable" role="presentation" tabindex="-1" style="-moz-user-select: none; margin: 0px; width: 243px; height: 400px;">
+<div class="col-md-3 nano has-scrollbar" id="leftCol">
+<!-- Tree Nav START --!>
+<!-- Tree Nav END --!>
+</div></div></div>
+<div id="tab-panel-body" class="x-panel-body  webui4-tabpanel-body x-panel-body-default x-panel-body-default x-layout-fit" style="width: 1091px; height: 250px; left: 0px; top: 28px;">
+<div id="config-tab" class="x-panel header-tabs x-panel-default" role="presentation" style="margin: 0px; width: 1091px; height: 250px;">
+<div id="config-tab-body" class="x-panel-body webui4-panel-body x-panel-body-default x-panel-body-default x-docked-noborder-top x-docked-noborder-right x-docked-noborder-bottom x-docked-noborder-left" style="width: 1091px; height: 250px; left: 0px; top: 0px;">
+<div id="webui-centerpanel" class="x-panel webui4-datapanel x-panel-default" style="margin: 0px 24px 24px; height: 568px; width: 1027px;" role="form">
+<div id="webui-centerpanel-body" class="x-panel-body webui4-formpanel-body x-panel-body-default x-panel-body-default x-docked-noborder-top x-docked-noborder-right x-docked-noborder-bottom x-docked-noborder-left" style="left: 0px; top: 0px;">
+</div></div></div></div></div></div>
+<div id=webui-panel-body" class="x-panel-body x-formpanel-body"style="left: 280px; top:54px;">
+<form action="add_rule.py" name="addRuleForm" method="post">
+<table border=2 claSS="x-box-inner" role="presentation">
+<tr><td><b>Source IPv4 Address</b></td><td>
+    <div class="sources">
+     <input name="sourceip" id="sourceip" type="text" list="listHosts" placeholder="Source" size='35'>
+	<datalist id="listHosts" name="listHosts" ></datalist>
+    </div>
+</td></tr>
+
+<tr><td><b>Destination IPv4 Address</b></td><td>
+    <div class="destinations">
+     <input name="destip" id="destip" type="text" list="destHosts" placeholder="Dest" size='35'>
+	<datalist id="destHosts" name="destHosts" ></datalist>
+    </div></td></tr>
+<tr><td><b>Port/Service</b></td>
+	<td colspan=2>
+        <input list="TCPports" id="service" name="service" placeholder="Service" size=35>
+	<datalist name="TCPports" id="TCPports"></datalist>
+</td></tr>
+<tr><td><b>Action<i>(Accept<small>-on</small>/Deny<small>-off)</small></i></b></td><td align=center colspan=2><label class="switch"><input type="checkbox" name="raction" id="raction" checked="Accept"><span class="slider round"></span></label></td></tr>
+<tr><td colspan=3 align=center><button name="sendrule" id="sendrule" type="button" data-theme="b" data-icon="check" data-inline="true" >Submit</button></td></tr>
+</table>
+</form>
+</body>
+</html>
+
