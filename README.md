@@ -6,7 +6,29 @@ Written by CB Currier ccurrier@checkpoint.com
 
 Setup notes:
 
-bin directory must be ExecCGI defined in httpd.conf.
-Be sure your machine has access to your SmartCenter or MDM.
+httpd.conf example of settings you will need:
+	<IfModule mime_module>
+		 AddHandler cgi-script .py
+	</IfModule>
+	<IfModule alias_module>
+		 ScriptAlias /simple/bin "/var/www/html/simple/bin"
+	</IfModule>
+	<Directory "/var/www/html/simple/bin">
+	    AllowOverride None
+	    Options +ExecCGI 
+	    Require all granted
+	</Directory>
 
-Paths are relative.
+Also be sure your machine has access to your SmartCenter or MDM.
+
+Paths in page are relative.
+Finally, in bin/add-rule-helper.py set credentials and SmartCenter / MDM address and port.
+
+server='192.168.1.100'
+muser='apiuser'
+mpass='CProcks'
+mport='443'
+domain='Default'
+session=''
+
+
